@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="teleop_imu_node" pkg="wiimote" type="teleop_imu_node.py" output="screen">
+    <rosparam file="$(find wiimote)/config/wiimote_teleop.yaml"/>
+    <param name="button_mapping" type="yaml" value="{forward: 1, backward: 0, stop: 4}" />
+  </node>
+
+</launch>

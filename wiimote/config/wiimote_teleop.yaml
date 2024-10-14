@@ -1,0 +1,22 @@
+buttons:
+  forward: 1  # 前進用のボタン
+  backward: 0  # 後退用のボタン
+  stop: 4  # 停止用のボタン
+
+linear_speeds:
+  forward: 0.2  # 前進速度
+  backward: -0.2  # 後退速度
+  stop: 0.0  # 停止時の速度
+
+# ボタンの状態をチェック
+# static const int MSG_BTN_1     = 0;
+# static const int MSG_BTN_2     = 1;
+# static const int MSG_BTN_PLUS  = 2;
+# static const int MSG_BTN_MINUS = 3;
+# static const int MSG_BTN_A     = 4;
+# static const int MSG_BTN_B     = 5;
+# static const int MSG_BTN_UP    = 6;
+# static const int MSG_BTN_DOWN  = 7;
+# static const int MSG_BTN_LEFT  = 8;
+# static const int MSG_BTN_RIGHT = 9;
+# static const int MSG_BTN_HOME  = 10;
