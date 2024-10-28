@@ -24,24 +24,36 @@ class TeleopImuNode:
         # /cmd_velパブリッシャを設定
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 
+        # Joyデータを保持する変数
+        self.joy_data = None
+
     def map_value(self, value, in_min, in_max, out_min, out_max):
         # 線形マッピングの公式
         return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
     def imu_callback(self, imu_data):
-        # IMUの線形加速度のy成分を取得
-        linear_accel_y = imu_data.linear_acceleration.y
+        # Joyデータが存在し、前進または後退ボタンが押されている場合にのみ角速度を設定
+        if self.joy_data and (self.joy_data.buttons[self.button_mapping['forward']] == 1 or 
+                              self.joy_data.buttons[self.button_mapping['backward']] == 1):
+            # IMUの線形加速度のy成分を取得
+            linear_accel_y = imu_data.linear_acceleration.y
 
-        # IMUの線形加速度yを -10から10の範囲から -1から1の範囲にマッピング
-        mapped_angular_z = self.map_value(linear_accel_y, -10, 10, -1, 1)
+            # IMUの線形加速度yを -10から10の範囲から -1から1の範囲にマッピング
+            mapped_angular_z = self.map_value(linear_accel_y, -10, 10, -1, 1)
 
-        # 角速度を設定
-        self.vel.angular.z = mapped_angular_z  # 正規化された角速度を適用
+            # 角速度を設定
+            self.vel.angular.z = mapped_angular_z  # 正規化された角速度を適用
+        else:
+            # ボタンが押されていない場合は角速度をゼロに設定
+            self.vel.angular.z = 0.0
 
         # 速度コマンドをパブリッシュ
         self.cmd_vel_pub.publish(self.vel)
 
     def joy_callback(self, joy):
+        # Joyデータを保存
+        self.joy_data = joy
+
         # yamlで指定されたボタンの状態をチェック
         if joy.buttons[self.button_mapping['forward']] == 1:
             self.vel.linear.x = self.linear_speeds['forward']  # 前進速度
@@ -49,7 +61,7 @@ class TeleopImuNode:
         elif joy.buttons[self.button_mapping['backward']] == 1:
             self.vel.linear.x = self.linear_speeds['backward']  # 後退速度
             rospy.loginfo(f"Speed changed to: {self.vel.linear.x} m/s")
-        else :
+        else:
             self.vel.linear.x = self.linear_speeds['stop']  # 停止速度
             rospy.loginfo(f"Speed changed to: {self.vel.linear.x} m/s")
 
